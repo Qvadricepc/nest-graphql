@@ -8,6 +8,8 @@ import { LessonModule } from './lesson/lesson.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      playground: true,
+      introspection: true,
     }),
     LessonModule,
   ],
