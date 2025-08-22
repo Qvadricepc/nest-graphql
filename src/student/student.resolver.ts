@@ -7,6 +7,15 @@ import { CreateStudentInput } from "./create-student.input";
 export class StudentResolver {
     constructor(private studentService: StudentService) {}
 
+    @Query(() => [StudentType])
+    students(): Promise<StudentType[]> {
+        return this.studentService.getStudents();
+    }
+
+    @Query(() => StudentType)
+    student(@Args('id') id: string): Promise<StudentType> {
+        return this.studentService.getStudent(id);
+    }
 
     @Mutation(() => StudentType)
     createStudent(@Args('createStudentInput') createStudentInput: CreateStudentInput): Promise<StudentType> {

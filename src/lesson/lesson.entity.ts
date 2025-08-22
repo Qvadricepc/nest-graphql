@@ -1,8 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { StudentType } from 'src/student/student.type';
+import { Entity, ObjectIdColumn, ObjectId, Column } from 'typeorm';
 
 @Entity()
 export class Lesson {
-    @PrimaryGeneratedColumn('uuid')
+    @ObjectIdColumn()
+    _id: ObjectId;
+
+    @Column()
     id: string;
 
     @Column()
@@ -15,5 +19,5 @@ export class Lesson {
     endDate: string;
 
     @Column()
-    students: string[];
+    students: StudentType[];
 }

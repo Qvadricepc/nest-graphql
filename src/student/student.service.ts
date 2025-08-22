@@ -23,11 +23,32 @@ export class StudentService {
         const objectId = new ObjectId();
         const student = this.studentRepository.create({
             _id: objectId,
-            id: objectId.toString(),
+            id: uuidv4(),
             firstName,
             lastName,
             lessons: [],
         });
         return this.studentRepository.save(student);
+    }
+
+    async getStudents(): Promise<StudentType[]> {
+        return this.studentRepository.find();
+    }
+
+    async getStudent(id: string): Promise<StudentType> {
+        const student = await this.studentRepository.findOne({ where: { id } });
+        if (!student) {
+            throw new Error('Student not found');
+        }
+        return student;
+    }
+
+    async getStudentsByIds(ids: string[]): Promise<StudentType[]> {
+        if (!ids || ids.length === 0) {
+            return [];
+        }
+        return this.studentRepository.find({ 
+            where: { id: { $in: ids } } 
+        });
     }
 }
