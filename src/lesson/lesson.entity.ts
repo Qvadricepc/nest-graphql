@@ -18,6 +18,6 @@ export class Lesson {
     @Column()
     endDate: string;
 
-    @Column()
-    students: StudentType[];
+    @Column({ default: [] })
+    studentIds: string[];
 }

@@ -16,25 +16,47 @@ export class LessonService {
     ) {}
 
     async getLesson(id: string): Promise<LessonType | null> {
-        return this.lessonRepository.findOne({ where: { id } });
+        const lesson = await this.lessonRepository.findOne({ where: { id } });
+        if (!lesson) {
+            return null;
+        }
+        return {
+            id: lesson.id,
+            name: lesson.name,
+            startDate: lesson.startDate,
+            endDate: lesson.endDate,
+            students: [] // This will be resolved by the field resolver
+        };
     }
 
     async createLesson(createLessonInput: CreateLessonInput): Promise<LessonType> {
-        const { name, startDate, endDate } = createLessonInput;
-        const objectId = new ObjectId();
+        const { name, startDate, endDate, students = [] } = createLessonInput;
         const lesson = this.lessonRepository.create({
-            _id: objectId,
             id: uuidv4(),
             name,
             startDate,
             endDate,
-            students: [],
+            studentIds: students
         });
-        return this.lessonRepository.save(lesson);
+        const savedLesson = await this.lessonRepository.save(lesson);
+        return {
+            id: savedLesson.id,
+            name: savedLesson.name,
+            startDate: savedLesson.startDate,
+            endDate: savedLesson.endDate,
+            students: [] // This will be resolved by the field resolver
+        };
     }
 
     async getAllLessons(): Promise<LessonType[]> {
-        return this.lessonRepository.find();
+        const lessons = await this.lessonRepository.find();
+        return lessons.map(lesson => ({
+            id: lesson.id,
+            name: lesson.name,
+            startDate: lesson.startDate,
+            endDate: lesson.endDate,
+            students: [] // This will be resolved by the field resolver
+        }));
     }
 
     async assignStudentToLesson(lessonId: string, studentsId: string[]): Promise<LessonType> {
@@ -42,8 +64,15 @@ export class LessonService {
         if (!lesson) {
             throw new Error('Lesson not found');
         }
-        const currentStudents = lesson.students || [];
-        lesson.students = [...currentStudents, ...studentsId] as StudentType[];
-        return this.lessonRepository.save(lesson);
+        const currentStudentIds = lesson.studentIds || [];
+        lesson.studentIds = [...currentStudentIds, ...studentsId];
+        const savedLesson = await this.lessonRepository.save(lesson);
+        return {
+            id: savedLesson.id,
+            name: savedLesson.name,
+            startDate: savedLesson.startDate,
+            endDate: savedLesson.endDate,
+            students: [] // This will be resolved by the field resolver
+        };
     }
 }
